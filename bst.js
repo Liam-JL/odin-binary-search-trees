@@ -23,7 +23,7 @@ class Tree {
         return root;
     } 
 
-    prettyPrint (node, prefix = "", isLeft = true) {
+    prettyPrint (node = this.root, prefix = "", isLeft = true) {
         if (node === null) {
             return;
         }
@@ -142,9 +142,9 @@ class Tree {
     find(value) {
         let currentNode = this.root;
         while (true) {
-            if (currentNode.value === value) return currentNode;
+            if (currentNode === null) return null
 
-            if (currentNode.leftChild === null && currentNode.rightChild === null) return null;
+            if (currentNode.value === value) return currentNode;
 
             if(value < currentNode.value) {
                 currentNode = currentNode.leftChild;
@@ -153,10 +153,116 @@ class Tree {
             }
         }
      }
+
+     levelOrder(callback) {
+        if (typeof(callback) != "function") {
+            throw new Error("Parameter not a callback function.")
+        }
+
+        if (this.root === null) {
+            return callback(null);
+        }
+
+        let queue = [this.root];
+
+        while (queue.length > 0) {
+            let next = queue.shift();
+            callback(next);
+
+            if (next.leftChild) queue.push(next.leftChild);
+            if (next.rightChild) queue.push(next.rightChild);
+        }
+     }
+
+     inOrder(callback, root = this.root) {
+        if (typeof(callback) != "function") {
+            throw new Error("Parameter not a callback function.")
+        }
+
+        if (root === null) {
+            return
+        }
+
+        this.inOrder(callback, root.leftChild);
+        callback(root.value);
+        this.inOrder(callback,root.rightChild)
+     }
+
+    preOrder(callback, root = this.root) {
+        if (typeof(callback) != "function") {
+            throw new Error("Parameter not a callback function.")
+        }
+
+        if (root === null) {
+            return
+        }
+
+        callback(root.value);
+        this.preOrder(callback, root.leftChild);
+        this.preOrder(callback,root.rightChild)
+     }
+
+    postOrder(callback, root = this.root) {
+        if (typeof(callback) != "function") {
+            throw new Error("Parameter not a callback function.")
+        }
+
+        if (root === null) {
+            return
+        }
+
+        this.postOrder(callback, root.leftChild);
+        this.postOrder(callback,root.rightChild)
+        callback(root.value);
+     }
+
+     //Return distance from specified node to furthest leaf within its own subtree
+     height(value) {
+
+        let currentNode = this.find(value);
+
+        //check distance from value to furthest node
+        function findHeight (current){
+            if (current === null) {
+                return -1
+            }
+            let leftHeight = findHeight(current.leftChild);
+            let rightHeight = findHeight(current.rightChild);
+            return  Math.max(leftHeight, rightHeight) +1
+        }
+
+        return findHeight(currentNode);
+    }
+     
+     //Distance from root to specified
+     depth(value) {
+        let currentNode = this.root;
+        let depth = 0;
+
+        while (currentNode !== null) {
+            if (value === currentNode.value) {
+                return depth;
+            }
+
+            if (value < currentNode.value) {
+                currentNode = currentNode.leftChild;
+            } else {
+                currentNode = currentNode.rightChild;
+            }
+
+            depth++;
+        }
+
+        // Value not found
+        return -1;
+     }
+
+     //Check balance for every node recursively 
+     isBalanced(root = this.root) {
+        
+     }
 }
 
 const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const tree = new Tree(arr);
-tree.delete(8)
-tree.delete(9)
-tree.prettyPrint(tree.root)
+console.log(tree.depth(1))
