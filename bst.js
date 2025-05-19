@@ -259,10 +259,50 @@ class Tree {
 
      //Check balance for every node recursively 
      isBalanced(root = this.root) {
-        
+        function checkBalance(node) {
+            if (node === null) return {height: -1, balanced: true}; //an empty node is balanced, doesn't count to height
+
+            const left = checkBalance(node.leftChild);
+            const right = checkBalance(node.rightChild);
+
+            const height = Math.max(left.height, right.height) + 1;
+            const balanced = left.balanced && right.balanced && Math.abs(left.height - right.height) <= 1;
+
+            return {height, balanced};
+        }
+
+        return checkBalance(root).balanced
+     }
+
+     rebalance() {
+        const oldTreeArray = [];
+        this.inOrder((data) => {oldTreeArray.push(data)})
+        this.root = this.buildTree(oldTreeArray);
      }
 }
 
-const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
+//Driver
+//Generate n length array of integers from 0 - 100
+function generateRandomArray (n) {
+    let array = [];
+    while (n > 0) {
+        array.push(Math.floor(Math.random() * 101));
+        n --
+    }
+    return array;
+}
+
+const arr = generateRandomArray(20);
 const tree = new Tree(arr);
-console.log(tree.depth(1))
+console.log(`Tree is balanced: ${tree.isBalanced()}`)
+const unbalancingArr = [203, 356, 5670, 6580, 6099];
+for (int of unbalancingArr) {
+    tree.insert(int);
+}
+console.log(`Tree is balanced: ${tree.isBalanced()}`)
+tree.rebalance();
+console.log(`Tree is balanced: ${tree.isBalanced()}`)
+tree.levelOrder(console.log);
+tree.inOrder(console.log);
+tree.preOrder(console.log);
+tree.postOrder(console.log)
